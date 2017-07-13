@@ -85,6 +85,18 @@ public class MainActivity extends AppCompatActivity {
         List<ChatMessage> chatMessages = new ArrayList<>();
         mMessageAdapter = new MessageAdapter(this, R.layout.item_message, chatMessages);
         mMessageListView.setAdapter(mMessageAdapter);
+        
+         // ImagePickerButton shows an image picker to upload a image for a message
+        mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO: Fire an intent to show an image picker
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/jpeg");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(Intent.createChooser(intent, "complete action using"), RC_PHOTO_PICKER);
+            }
+        });
 
         mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
