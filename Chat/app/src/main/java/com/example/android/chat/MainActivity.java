@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 if (s.toString().trim().length() > 0)
                     mSendButton.setEnabled(true);
                 else
+                    //disable button
                     mSendButton.setEnabled(false);
             }
 
@@ -139,8 +140,8 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     //signed out
                     onSignedOutCleanup();
+                    
                     //providers
-
                     List<AuthUI.IdpConfig> providers = Arrays.asList(
                             new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
                             new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()
@@ -166,17 +167,32 @@ public class MainActivity extends AppCompatActivity {
             else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Sign in Cancelled!", Toast.LENGTH_SHORT).show();
                 finish();
-            } 
+            }
+        } else if (requestCode == RC_PHOTO_PICKER && resultCode == RESULT_OK) {
+            Uri imageUri = data.getData();
+            StorageReference photoRef = mStorageReference.child(imageUri.getLastPathSegment());
+            photoRef.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    @SuppressWarnings("VisibleForTests") Uri downloadUrl =
+                            taskSnapshot.getDownloadUrl();
+                    //Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                    ChatMessage chatMessage = new ChatMessage(null, mUsername, downloadUrl.toString());
+                    mDataBaseReference.push().setValue(chatMessage);
+                }
+            });
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        //menuInflater
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.main_menu, menu);
         return true;
     }
-
+    
+    //menu item sign_out button
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -227,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
             mChildEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    //display message
                     ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
                     mMessageAdapter.add(chatMessage);
                 }
