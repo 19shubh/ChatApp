@@ -1,5 +1,7 @@
 package com.example.android.chat;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -28,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
         List<ChatMessage> chatMessages = new ArrayList<>();
         mMessageAdapter = new MessageAdapter(this, R.layout.item_message, chatMessages);
         mMessageListView.setAdapter(mMessageAdapter);
-        
-         // ImagePickerButton shows an image picker to upload a image for a message
+
+        // ImagePickerButton shows an image picker to upload a image for a message
         mPhotoPickerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -140,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     //signed out
                     onSignedOutCleanup();
-                    
+
                     //providers
                     List<AuthUI.IdpConfig> providers = Arrays.asList(
                             new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
@@ -157,8 +161,8 @@ public class MainActivity extends AppCompatActivity {
         };
 
     }
-    
-     @Override
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
@@ -191,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
         menuInflater.inflate(R.menu.main_menu, menu);
         return true;
     }
-    
+
     //menu item sign_out button
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
