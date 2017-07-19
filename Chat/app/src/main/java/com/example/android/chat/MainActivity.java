@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private ImageButton mPhotoPickerButton;
     private EditText mMessageEditText;
-    private Button mSendButton;
+    private ImageButton mSendButton;
 
     private String mUsername;
 
@@ -73,7 +73,10 @@ public class MainActivity extends AppCompatActivity {
         mUsername = ANONYMOUS;
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mFirebaseStorage = FirebaseStorage.getInstance();
+
         mDataBaseReference = mFirebaseDatabase.getReference().child("message");
+        mStorageReference = mFirebaseStorage.getReference().child("chat_photos");
         mFirebaseAuth = FirebaseAuth.getInstance();
 
         // Initialize references to views
@@ -81,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         mMessageListView = (ListView) findViewById(R.id.messageListView);
         mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
         mMessageEditText = (EditText) findViewById(R.id.messageEditText);
-        mSendButton = (Button) findViewById(R.id.sendButton);
+        mSendButton = (ImageButton) findViewById(R.id.sendButton);
 
         mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
@@ -276,3 +279,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+
