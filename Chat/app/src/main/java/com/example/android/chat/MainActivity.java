@@ -1,7 +1,9 @@
 package com.example.android.chat;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
+import android.speech.RecognizerIntent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,6 +38,9 @@ import com.google.firebase.storage.UploadTask;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+
+import static android.R.attr.prompt;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int DEFAULT_MSG_LENGTH_LIMIT = 1000;
     public static final int RC_SIGN_IN = 1;
     private static final int RC_PHOTO_PICKER = 2;
+    private final int REQ_CODE_SPEECH_INPUT = 100;
 
     private ListView mMessageListView;
     private MessageAdapter mMessageAdapter;
@@ -52,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton mPhotoPickerButton;
     private EditText mMessageEditText;
     private ImageButton mSendButton;
+    private ImageButton mVoiceButton;
 
     private String mUsername;
 
@@ -85,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         mPhotoPickerButton = (ImageButton) findViewById(R.id.photoPickerButton);
         mMessageEditText = (EditText) findViewById(R.id.messageEditText);
         mSendButton = (ImageButton) findViewById(R.id.sendButton);
-
+        mVoiceButton = (ImageButton) findViewById(R.id.voiceButton);
         mProgressBar.setVisibility(ProgressBar.INVISIBLE);
 
         // Initialize message ListView and its adapter
@@ -137,6 +144,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        mVoiceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                promptSpeechInput();
+            }
+        });
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -165,6 +178,24 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //Google Speech Input dialog
+
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+                "Speech prompted");
+        try {
+            startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getApplicationContext(),
+                    "Speech not supported",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -188,6 +219,12 @@ public class MainActivity extends AppCompatActivity {
                     mDataBaseReference.push().setValue(chatMessage);
                 }
             });
+        } else if (requestCode == REQ_CODE_SPEECH_INPUT) {
+            if (resultCode == RESULT_OK && null != data) {
+                //Speech recognizer
+                ArrayList<String> result = data
+                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            }
         }
     }
 
@@ -279,4 +316,3 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
-
