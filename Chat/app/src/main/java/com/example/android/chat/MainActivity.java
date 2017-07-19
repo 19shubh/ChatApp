@@ -40,8 +40,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import static android.R.attr.prompt;
-
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -224,6 +222,11 @@ public class MainActivity extends AppCompatActivity {
                 //Speech recognizer
                 ArrayList<String> result = data
                         .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+
+                ChatMessage chatMessage = new ChatMessage(result.get(0), mUsername, null);
+                mDataBaseReference.push().setValue(chatMessage);
+
+                mMessageEditText.setText("");
             }
         }
     }
